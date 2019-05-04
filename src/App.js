@@ -30,7 +30,18 @@ const GET_USER = (user) => `
           id
         	name
         	avatarUrl
+          email
+
       	}
+      }
+    }
+
+    organizations(last: 5){
+      edges{
+        node{
+          id
+          name
+        }
       }
     }
 
@@ -137,7 +148,35 @@ const User = ({ user, errors }) => {
      {followers.edges.map(followers => (
        <li key={followers.node.id}>
         <img src={followers.node.avatarUrl}/>
-        <div><b>Name:</b>{followers.node.name}</div>
+
+        {followers && followers.node && followers.node.name &&
+            (<div>Name:{followers.node.name}</div>)
+        }
+
+        {followers && followers.node && followers.node.email &&
+            (<div>Email:{followers.node.email}</div>)
+        }
+
+       </li>
+     ))}
+   </ul>
+
+  </div>
+  );
+
+  const Organizations = ({ organizations }) => (
+  <div>
+
+    <strong>Organizations:</strong>
+
+    <ul>
+     {organizations.edges.map(organizations => (
+       <li key={organizations.node.id}>
+
+       {organizations && organizations.node && organizations.node.name &&
+           (<div>Name:{organizations.node.name}</div>)
+       }
+
        </li>
      ))}
    </ul>
@@ -153,7 +192,11 @@ const User = ({ user, errors }) => {
     <ul>
      {repositories.edges.map(repositories => (
        <li key={repositories.node.id}>
-        <div><b>Name:</b>{repositories.node.name}</div>
+
+       {repositories && repositories.node && repositories.node.name &&
+           (<div>Name:{repositories.node.name}</div>)
+       }
+
        </li>
      ))}
    </ul>
@@ -165,15 +208,37 @@ const User = ({ user, errors }) => {
     <div>
       <p>
         <strong>User Data:</strong>
-        <div><img src={user.avatarUrl}/></div>
-        <div>Login:{user.login}</div>
-        <div>Name:{user.name}</div>
-        <div>Company:{user.company}</div>
-        <div>Number of Gists:{user.gists.totalCount}</div>
-        <div>Following:{user.following.totalCount}</div>
+
+        {user && user.avatarUrl &&
+          (<div><img src={user.avatarUrl}/></div>)
+        }
+
+        {user && user.login &&
+          (<div>Login:{user.login}</div>)
+        }
+
+        {user && user.name &&
+          (<div>Name:{user.name}</div>)
+        }
+
+        {user && user.company &&
+          (<div>Company:{user.company}</div>)
+        }
+
+        {user && user.gists && user.gists.totalCount &&
+          (<div>Number of Gists:{user.gists.totalCount}</div>)
+        }
+
+        {user && user.following && user.following.totalCount &&
+          (<div>Following:{user.following.totalCount}</div>)
+        }
+
       </p>
+
          <Repositories repositories={user.repositories} />
+         <Organizations organizations={user.organizations} />
          <Followers followers={user.followers} />
+
     </div>
   );
 };
