@@ -1,3 +1,8 @@
+NOTE: Create .env file and insert it on the root directory. The .env file should have the
+personal access token to perform requests on github according to the example below:
+
+Example: REACT_APP_GITHUB_PERSONAL_ACCESS_TOKEN=xxxXXX
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
