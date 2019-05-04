@@ -15,22 +15,24 @@ const GET_USER = (user) => `
     login
     avatarUrl
     company
+    email
 
     gists{
-     totalCount
-   }
+      totalCount
+    }
 
-   following{
+    following{
       totalCount
     }
 
     followers(last: 5){
       edges{
-    		node{
+        node{
           id
-        	name
-        	avatarUrl
-      	}
+          name
+          avatarUrl
+          email
+        }
       }
     }
 
@@ -50,9 +52,9 @@ const GET_USER = (user) => `
 export default class App extends React.Component{
 
   state = {
-   path: '<user-login>',
-   user: null,
-   errors: null,
+    path: '<user-login>',
+    user: null,
+    errors: null,
   };
 
   componentDidMount() {
@@ -60,120 +62,126 @@ export default class App extends React.Component{
   }
 
   onChange = event => {
-   this.setState({ path: event.target.value });
+    this.setState({ path: event.target.value });
   };
 
   onSubmit = event => {
-   this.onFetchFromGitHub(this.state.path);
+    this.onFetchFromGitHub(this.state.path);
 
-   event.preventDefault();
+    event.preventDefault();
   };
 
   onFetchFromGitHub = path => {
     const [user] = path.split();
 
     axiosGitHubGraphQL
-      .post('', { query: GET_USER(user), })
-      .then(result =>
-        this.setState(() => ({
-          user: result.data.data.user,
-          errors: result.data.errors,
-        })),
-      );
+    .post('', { query: GET_USER(user), })
+    .then(result =>
+          this.setState(() => ({
+            user: result.data.data.user,
+            errors: result.data.errors,
+          })),
+         );
   }
 
 
 
-    render(){
-      const { path, user, errors } = this.state;
+  render(){
+    const { path, user, errors } = this.state;
 
-        return (
-
-            <div>
-                <div><h1>User Data:</h1></div>
-
-                <form onSubmit={this.onSubmit}>
-                  <label htmlFor="url">
-                  Username:
-                  </label>
-                  <input
-                    id="url"
-                    type="text"
-                    value={path}
-                    onChange={this.onChange}
-                    style={{ width: '100px' }}
-                    />
-                    <button type="submit">Search</button>
-                </form>
-
-        <hr />
-
-        {user ? (<User user={user} errors={errors} />) : (<p>No information yet ...</p>)}
-
-            </div>
-
-               );
-    }
-
-
-}
-
-const User = ({ user, errors }) => {
-  if (errors) {
     return (
-      <p>
-        <strong>Something went wrong:</strong>
-        {errors.map(error => error.message).join(' ')}
-      </p>
-    );
-  }
 
-  const Followers = ({ followers }) => (
-  <div>
+      <div>
+        <div><h1>User Data:</h1></div>
 
-    <strong>Followers:</strong>
+        <form onSubmit={this.onSubmit}>
+          <label htmlFor="url">
+              Username:
+          </label>
+          <input
+            id="url"
+            type="text"
+            value={path}
+            onChange={this.onChange}
+            style={{ width: '100px' }}
+          />
+            <button type="submit">Search</button>
+          </form>
 
-    <ul>
-     {followers.edges.map(followers => (
-       <li key={followers.node.id}>
-        <img src={followers.node.avatarUrl}/>
-        <div><b>Name:</b>{followers.node.name}</div>
-       </li>
-     ))}
-   </ul>
+          <hr />
 
-  </div>
-  );
+            {user ? (<User user={user} errors={errors} />) : (<p>No information yet ...</p>)}
 
-  const Repositories = ({ repositories }) => (
-  <div>
+          </div>
 
-    <strong>Repositories:</strong>
+            );
+            }
 
-    <ul>
-     {repositories.edges.map(repositories => (
-       <li key={repositories.node.id}>
-        <div><b>Name:</b>{repositories.node.name}</div>
-       </li>
-     ))}
-   </ul>
 
-  </div>
-  );
+            }
 
-  return (
-    <div>
-      <p>
-        <strong>User Data:</strong>
-        <div><img src={user.avatarUrl}/></div>
-        <div>Login:{user.login}</div>
-        <div>Name:{user.name}</div>
-        <div>Company:{user.company}</div>
-        <div>Number of Gists:{user.gists.totalCount}</div>
-        <div>Following:{user.following.totalCount}</div>
-      </p>
-         <Repositories repositories={user.repositories} />
-         <Followers followers={user.followers} />
-    </div>
-  );
-};
+            const User = ({ user, errors }) => {
+            if (errors) {
+            return (
+          <p>
+            <strong>Something went wrong:</strong>
+              {errors.map(error => error.message).join(' ')}
+          </p>
+            );
+            }
+
+            const Followers = ({ followers }) => (
+              <div>
+
+                <strong>Followers updated for SO:</strong>
+
+                <ul>
+                    {followers.edges.map(follower => (
+                  <li key={follower.node.id}>
+                    <img src={follower.node.avatarUrl}/>
+                    <div>
+                        {follower && follower.node && follower.node.name && (
+                      <div>Name:{follower.node.name}</div>) }
+                    </div>
+                    <div>
+                        {follower && follower.node && follower.node.email && (
+                      <div>Email:{follower.node.email}</div>) }
+                    </div>
+                  </li>
+                    ))}
+                </ul>
+              </div>
+                );
+
+                const Repositories = ({ repositories }) => (
+              <div>
+
+                <strong>Repositories:</strong>
+
+                <ul>
+                    {repositories.edges.map(repositories => (
+                  <li key={repositories.node.id}>
+                    <div><b>Name:</b>{repositories.node.name}</div>
+                  </li>
+                    ))}
+                </ul>
+
+              </div>
+                );
+
+                return (
+              <div>
+                <p>
+                  <strong>User Data:</strong>
+                  <div><img src={user.avatarUrl}/></div>
+                  <div>Login:{user.login}</div>
+                  <div>Name:{user.name}</div>
+                  <div>Company:{user.company}</div>
+                  <div>Number of Gists:{user.gists.totalCount}</div>
+                  <div>Following:{user.following.totalCount}</div>
+                </p>
+                <Repositories repositories={user.repositories} />
+                <Followers followers={user.followers} />
+              </div>
+                );
+                };
